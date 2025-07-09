@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src/backend:/app
+      - /app/node_modules
+    depends_on:
+      - database
+
+  # Dashboard service
+  dashboard:
+    build:
+      context: ./src/dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src/dashboard:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  # Simulator service
+  simulator:
+    build:
+      context: ./src/simulator
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src/simulator:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  # Database service
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: tauk_db
+      POSTGRES_USER: tauk_user
+      POSTGRES_PASSWORD: tauk_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: 
